@@ -1,0 +1,26 @@
+@import '@coreui/coreui/dist/css/coreui.min.css';
+@import '@coreui/icons/css/free.min.css';
+
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.wrapper {
+    padding-left: var(--cui-sidebar-occupy-start, 0);
+    will-change: auto;
+}
+
+.sidebar-brand {
+    color: inherit;
+}
+
+.card {
+    border-radius: 0.5rem;
+}
+
+.hash-cell {
+    display: inline-block;
+    max-width: min(42rem, 72vw);
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
