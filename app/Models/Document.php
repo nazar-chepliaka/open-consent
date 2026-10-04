@@ -11,7 +11,7 @@ class Document extends Model
 {
     use UsesUuid;
 
-    protected $fillable = ['owner_vault_id', 'type', 'title', 'visibility'];
+    protected $fillable = ['owner_vault_id', 'title', 'visibility'];
 
     public function ownerVault(): BelongsTo
     {

@@ -22,13 +22,12 @@ class DocumentService
 
             $document = Document::create([
                 'owner_vault_id' => $vault->id,
-                'type' => $attributes['type'] ?? 'private_document',
                 'title' => $attributes['title'],
                 'visibility' => 'private',
             ]);
 
             $version = $this->createVersion($document, $object, [
-                'version_label' => $attributes['version_label'] ?? 'initial',
+                'version_label' => $attributes['version_label'] ?? null,
                 'captured_at' => $attributes['captured_at'] ?? now(),
                 'published_at' => $attributes['published_at'] ?? null,
                 'effective_from' => $attributes['effective_from'] ?? null,

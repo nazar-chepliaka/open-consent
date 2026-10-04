@@ -56,7 +56,6 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('owner_vault_id')->nullable()->constrained('vaults')->cascadeOnDelete();
-            $table->string('type', 48);
             $table->string('title');
             $table->string('visibility', 24);
             $table->timestamps();

@@ -18,8 +18,6 @@ class StoreDocumentRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'type' => ['nullable', 'string', 'max:48'],
-            'version_label' => ['nullable', 'string', 'max:255'],
             'file' => ['required', 'file', 'max:51200'],
         ];
     }

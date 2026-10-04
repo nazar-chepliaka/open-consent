@@ -8,6 +8,7 @@ use App\Services\VaultService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class VaultController extends Controller
 {
@@ -27,7 +28,7 @@ class VaultController extends Controller
 
     public function show(Vault $vault): View
     {
-        $this->authorize('view', $vault);
+        Gate::authorize('view', $vault);
 
         return view('vaults.show', [
             'vault' => $vault,

@@ -10,7 +10,10 @@ class StoredObjectPolicy
     public function view(User $user, StoredObject $storedObject): bool
     {
         return $storedObject->vault()
-            ->whereHas('members', fn ($query) => $query->whereKey($user->id))
+            ->where(function ($query) use ($user) {
+                $query->where('owner_id', $user->id)
+                    ->orWhereHas('members', fn ($query) => $query->whereKey($user->id));
+            })
             ->exists();
     }
 }

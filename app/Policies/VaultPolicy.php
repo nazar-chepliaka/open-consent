@@ -17,6 +17,11 @@ class VaultPolicy
         return $vault->owner_id === $user->id || $this->hasRole($user, $vault, ['admin']);
     }
 
+    public function delete(User $user, Vault $vault): bool
+    {
+        return $vault->owner_id === $user->id;
+    }
+
     public function createDocument(User $user, Vault $vault): bool
     {
         return $vault->owner_id === $user->id || $this->hasRole($user, $vault, ['admin', 'editor']);

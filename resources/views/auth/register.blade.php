@@ -5,7 +5,10 @@
         <div class="col-md-7 col-lg-5">
             <div class="card">
                 <div class="card-body p-4">
-                    <h1 class="h4 mb-2">Open Consent</h1>
+                    <div class="app-brand-stack mb-3">
+                        <img class="brand-logo" src="{{ asset('images/logo.svg') }}" alt="">
+                        <h1 class="h4 mb-0">Open Consent</h1>
+                    </div>
                     <p class="text-body-secondary mb-4">Створіть обліковий запис для персонального архіву.</p>
 
                     <form method="post" action="{{ route('register.store') }}" class="d-flex flex-column gap-3">

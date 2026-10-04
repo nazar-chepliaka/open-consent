@@ -9,12 +9,13 @@ use App\Models\Vault;
 use App\Services\DocumentService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 
 class DocumentController extends Controller
 {
     public function create(Vault $vault): View
     {
-        $this->authorize('createDocument', $vault);
+        Gate::authorize('createDocument', $vault);
 
         return view('documents.create', ['vault' => $vault]);
     }
@@ -28,7 +29,7 @@ class DocumentController extends Controller
 
     public function show(Document $document): View
     {
-        $this->authorize('view', $document);
+        Gate::authorize('view', $document);
 
         return view('documents.show', [
             'document' => $document->load(['ownerVault', 'versions.originalObject']),

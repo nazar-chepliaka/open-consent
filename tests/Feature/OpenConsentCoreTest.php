@@ -2,11 +2,14 @@
 
 use App\Models\ConsentEvent;
 use App\Models\ConsentGrant;
+use App\Models\ArchiveEntry;
 use App\Models\Document;
+use App\Models\DocumentVersion;
 use App\Models\Evidence;
 use App\Models\Jurisdiction;
 use App\Models\LegalInstrument;
 use App\Models\Party;
+use App\Models\StoredObject;
 use App\Models\User;
 use App\Services\ConsentIntegrityService;
 use App\Services\DocumentService;
@@ -51,6 +54,61 @@ test('private document upload stores immutable versions and original sha256', fu
         ->and($first->id)->not->toBe($second->id);
 });
 
+test('a document can be created without a generic type', function () {
+    $vault = app(VaultService::class)->createForUser(User::factory()->create(), 'Archive');
+
+    $document = Document::create([
+        'owner_vault_id' => $vault->id,
+        'title' => 'Untyped logical document',
+        'visibility' => 'private',
+    ]);
+
+    expect($document->refresh()->title)->toBe('Untyped logical document');
+});
+
+test('initial upload creates the document chain without type or version label', function () {
+    Storage::fake('local');
+    Storage::fake('public');
+    $owner = User::factory()->create();
+    $vault = app(VaultService::class)->createForUser($owner, 'Archive');
+
+    $response = $this->actingAs($owner)
+        ->post(route('vaults.documents.store', $vault), [
+            'title' => 'Private contract',
+            'file' => fakeTextFile('contract.txt', 'private terms'),
+        ]);
+
+    $document = Document::query()->where('title', 'Private contract')->firstOrFail();
+    $version = DocumentVersion::query()->where('document_id', $document->id)->firstOrFail();
+    $object = StoredObject::query()->whereKey($version->original_object_id)->firstOrFail();
+
+    $response->assertRedirect(route('documents.show', $document, absolute: false));
+
+    expect(Document::query()->whereKey($document->id)->exists())->toBeTrue()
+        ->and($version->version_label)->toBeNull()
+        ->and($object->content_hash_algorithm)->toBe('sha256')
+        ->and($object->content_hash)->toBe(hash('sha256', 'private terms'))
+        ->and(ArchiveEntry::query()->where('document_version_id', $version->id)->where('vault_id', $vault->id)->exists())->toBeTrue()
+        ->and(Storage::disk('local')->exists($object->object_key))->toBeTrue()
+        ->and(Storage::disk('public')->exists($object->object_key))->toBeFalse();
+});
+
+test('unauthorized user cannot upload into another users vault', function () {
+    Storage::fake('local');
+    $owner = User::factory()->create();
+    $stranger = User::factory()->create();
+    $vault = app(VaultService::class)->createForUser($owner, 'Archive');
+
+    $this->actingAs($stranger)
+        ->post(route('vaults.documents.store', $vault), [
+            'title' => 'Intrusion',
+            'file' => fakeTextFile('intrusion.txt', 'nope'),
+        ])
+        ->assertForbidden();
+
+    expect(Document::query()->where('title', 'Intrusion')->exists())->toBeFalse();
+});
+
 test('another user cannot access a private document or its stored object', function () {
     Storage::fake('local');
     $owner = User::factory()->create();
@@ -65,6 +123,77 @@ test('another user cannot access a private document or its stored object', funct
         ->and(Gate::forUser($stranger)->allows('view', $version->originalObject))->toBeFalse();
 });
 
+test('owner can access their vault over http', function () {
+    $owner = User::factory()->create();
+    $vault = app(VaultService::class)->createForUser($owner, 'Archive');
+
+    $this->actingAs($owner)
+        ->get(route('vaults.show', $vault))
+        ->assertOk()
+        ->assertSee('Archive');
+});
+
+test('another user cannot access a private vault over http', function () {
+    $owner = User::factory()->create();
+    $stranger = User::factory()->create();
+    $vault = app(VaultService::class)->createForUser($owner, 'Archive');
+
+    $this->actingAs($stranger)
+        ->get(route('vaults.show', $vault))
+        ->assertForbidden();
+});
+
+test('owner can perform implemented authorized vault document actions', function () {
+    Storage::fake('local');
+    $owner = User::factory()->create();
+    $vault = app(VaultService::class)->createForUser($owner, 'Archive');
+
+    $this->actingAs($owner)
+        ->get(route('vaults.documents.create', $vault))
+        ->assertOk();
+
+    $response = $this->actingAs($owner)
+        ->post(route('vaults.documents.store', $vault), [
+            'title' => 'Private contract',
+            'file' => fakeTextFile('contract.txt', 'private terms'),
+        ]);
+
+    $document = Document::query()->where('title', 'Private contract')->firstOrFail();
+    $response->assertRedirect(route('documents.show', $document, absolute: false));
+
+    $this->actingAs($owner)
+        ->get(route('documents.show', $document))
+        ->assertOk()
+        ->assertSee('Private contract');
+
+    $this->actingAs($owner)
+        ->post(route('documents.versions.store', $document), [
+            'version_label' => 'second',
+            'file' => fakeTextFile('contract-v2.txt', 'updated terms'),
+        ])
+        ->assertRedirect(route('documents.show', $document, absolute: false));
+
+    expect($document->versions()->count())->toBe(2);
+});
+
+test('authorization failure returns forbidden instead of missing controller authorize method', function () {
+    Storage::fake('local');
+    $owner = User::factory()->create();
+    $stranger = User::factory()->create();
+    $vault = app(VaultService::class)->createForUser($owner, 'Archive');
+    $version = app(DocumentService::class)->uploadPrivateDocument($vault, fakeTextFile('private.txt', 'secret'), [
+        'title' => 'Private contract',
+    ]);
+
+    $this->actingAs($stranger)
+        ->get(route('vaults.documents.create', $vault))
+        ->assertForbidden();
+
+    $this->actingAs($stranger)
+        ->get(route('documents.show', $version->document))
+        ->assertForbidden();
+});
+
 test('one public legal document can be attached to several vaults without duplication', function () {
     $firstUser = User::factory()->create();
     $secondUser = User::factory()->create();
@@ -73,7 +202,6 @@ test('one public legal document can be attached to several vaults without duplic
 
     $document = Document::create([
         'owner_vault_id' => null,
-        'type' => 'law',
         'title' => 'Public act',
         'visibility' => 'public',
     ]);
@@ -100,7 +228,6 @@ test('the system rejects linking a private stored object to another vault docume
     $secondVault = app(VaultService::class)->createForUser(User::factory()->create(), 'Second');
     $document = Document::create([
         'owner_vault_id' => $firstVault->id,
-        'type' => 'contract',
         'title' => 'Contract',
         'visibility' => 'private',
     ]);

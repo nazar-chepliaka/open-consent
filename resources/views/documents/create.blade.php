@@ -15,25 +15,9 @@
                     @csrf
 
                     <div class="col-12">
-                        <label for="title" class="form-label">Назва</label>
+                        <label for="title" class="form-label">Назва документа</label>
                         <input id="title" class="form-control @error('title') is-invalid @enderror" name="title" value="{{ old('title') }}" required>
                         @error('title')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="type" class="form-label">Тип</label>
-                        <input id="type" class="form-control @error('type') is-invalid @enderror" name="type" value="{{ old('type', 'private_document') }}">
-                        @error('type')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="version_label" class="form-label">Позначка версії</label>
-                        <input id="version_label" class="form-control @error('version_label') is-invalid @enderror" name="version_label" value="{{ old('version_label', 'initial') }}">
-                        @error('version_label')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

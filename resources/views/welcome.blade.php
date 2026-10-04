@@ -4,13 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'Open Consent') }}</title>
+    <link rel="icon" href="{{ asset('images/logo.svg') }}" type="image/svg+xml">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-body-tertiary">
     <div class="min-vh-100 d-flex flex-column">
         <header class="py-3">
             <div class="container d-flex align-items-center justify-content-between gap-3">
-                <a class="fw-semibold text-body text-decoration-none" href="{{ url('/') }}">Open Consent</a>
+                <a class="app-brand-lockup fw-semibold text-body text-decoration-none" href="{{ url('/') }}">
+                    <img class="brand-logo brand-logo-sm" src="{{ asset('images/logo.svg') }}" alt="">
+                    <span>Open Consent</span>
+                </a>
 
                 <nav class="d-flex align-items-center gap-2" aria-label="Головна навігація">
                     @guest
@@ -40,7 +44,10 @@
                                     <p class="text-body-secondary mb-2">Вітаємо, {{ auth()->user()->name }}.</p>
                                 @endauth
 
-                                <h1 class="display-6 fw-semibold mb-3">Open Consent</h1>
+                                <div class="app-brand-stack mb-3">
+                                    <img class="brand-logo" src="{{ asset('images/logo.svg') }}" alt="">
+                                    <h1 class="display-6 fw-semibold mb-0">Open Consent</h1>
+                                </div>
                                 <p class="lead text-body-secondary mb-4">
                                     Персональний архів правових документів, договорів і згод.
                                 </p>

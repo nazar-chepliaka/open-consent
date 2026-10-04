@@ -11,8 +11,15 @@
 <div class="sidebar sidebar-dark sidebar-fixed border-end" id="sidebar">
     <div class="sidebar-header border-bottom">
         <a class="sidebar-brand text-decoration-none" href="{{ route('dashboard') }}">
-            <span class="sidebar-brand-full fw-semibold">Open Consent</span>
-            <span class="sidebar-brand-narrow fw-semibold">OC</span>
+            <span class="sidebar-brand-full fw-semibold">
+                <span class="app-brand-lockup">
+                    <img class="sidebar-brand-logo" src="{{ asset('images/logo.svg') }}" alt="">
+                    <span>Open Consent</span>
+                </span>
+            </span>
+            <span class="sidebar-brand-narrow">
+                <img class="sidebar-brand-logo" src="{{ asset('images/logo.svg') }}" alt="Open Consent">
+            </span>
         </a>
     </div>
 

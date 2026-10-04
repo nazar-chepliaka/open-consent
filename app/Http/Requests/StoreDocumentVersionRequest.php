@@ -17,7 +17,7 @@ class StoreDocumentVersionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'version_label' => ['required', 'string', 'max:255'],
+            'version_label' => ['nullable', 'string', 'max:255'],
             'file' => ['required', 'file', 'max:51200'],
         ];
     }

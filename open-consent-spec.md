@@ -79,10 +79,12 @@ Open Consent — відкрита платформа для персональн
 
 | Сутність | Призначення | Основні поля |
 |---|---|---|
-| `documents` | Логічний документ | `id`, `owner_vault_id` (nullable для спільного реєстру), `type`, `title`, `visibility` |
+| `documents` | Логічний документ | `id`, `owner_vault_id` (nullable для спільного реєстру), `title`, `visibility` |
 | `document_versions` | Конкретна редакція | `id`, `document_id`, `version_label`, `original_object_id`, `published_at`, `effective_from`, `effective_to`, `captured_at` |
 | `document_sections` | Структурні частини редакції | `id`, `document_version_id`, `parent_id`, `section_key`, `heading`, `text`, `position` |
 | `document_sources` | Походження редакції | `id`, `document_version_id`, `source_url`, `publisher`, `retrieved_at`, `verification_status` |
+
+`documents` представляє логічний документ і не містить обов'язкового загального семантичного або юридичного типу. Правове значення фіксується через спеціалізовані доменні сутності та явні зв'язки там, де це доречно. Open Consent не повинен трактувати одну загальну класифікацію документа як встановлений юридичний факт. `visibility` є незалежним від семантичної або юридичної класифікації й описує питання доступу або публікації. `legal_instruments.instrument_type` залишається окремим полем, бо має специфічне доменне значення для нормативних джерел. Згода представлена через `consent_grants`, а не через призначення документу загального типу "consent". `document_versions.version_label` є необов'язковою людиночитною метаданою і не вимагається під час початкового завантаження.
 
 Оригінал документа незмінний після фіксації. Результат витягування тексту з PDF є похідною версіонованою репрезентацією, а не заміною оригіналу. `published_at`, `effective_from`, `captured_at` мають різні значення; застосовність редакції не визначається лише найпізнішою датою.
 

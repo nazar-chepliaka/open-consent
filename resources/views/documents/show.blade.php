@@ -18,7 +18,7 @@
                     @csrf
                     <div class="col-md-5">
                         <label for="version_label" class="form-label">Позначка версії</label>
-                        <input id="version_label" class="form-control @error('version_label') is-invalid @enderror" name="version_label" value="{{ old('version_label') }}" required>
+                        <input id="version_label" class="form-control @error('version_label') is-invalid @enderror" name="version_label" value="{{ old('version_label') }}">
                         @error('version_label')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

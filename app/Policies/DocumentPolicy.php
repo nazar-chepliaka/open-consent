@@ -14,7 +14,10 @@ class DocumentPolicy
         }
 
         return $document->ownerVault()
-            ->whereHas('members', fn ($query) => $query->whereKey($user->id))
+            ->where(function ($query) use ($user) {
+                $query->where('owner_id', $user->id)
+                    ->orWhereHas('members', fn ($query) => $query->whereKey($user->id));
+            })
             ->exists();
     }
 
@@ -25,7 +28,13 @@ class DocumentPolicy
         }
 
         return $document->ownerVault()
-            ->whereHas('members', fn ($query) => $query->whereKey($user->id)->wherePivotIn('role', ['owner', 'admin', 'editor']))
+            ->where(function ($query) use ($user) {
+                $query->where('owner_id', $user->id)
+                    ->orWhereHas(
+                        'members',
+                        fn ($query) => $query->whereKey($user->id)->wherePivotIn('role', ['owner', 'admin', 'editor'])
+                    );
+            })
             ->exists();
     }
 }
