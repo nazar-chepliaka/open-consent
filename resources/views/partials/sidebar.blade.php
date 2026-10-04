@@ -5,6 +5,7 @@
         ['title' => 'Документи', 'route' => null, 'icon' => 'cil-description'],
         ['title' => 'Правовідносини', 'route' => null, 'icon' => 'cil-link'],
         ['title' => 'Згоди', 'route' => null, 'icon' => 'cil-check-circle'],
+        ['title' => 'Налаштування', 'route' => 'settings.ai.index', 'icon' => 'cil-settings'],
     ];
 @endphp
 

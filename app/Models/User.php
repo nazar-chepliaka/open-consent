@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Models\Concerns\UsesUuid;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -25,6 +26,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'default_ai_connection_id',
     ];
 
     /**
@@ -58,5 +60,15 @@ class User extends Authenticatable
     public function vaults(): BelongsToMany
     {
         return $this->belongsToMany(Vault::class, 'vault_members')->withPivot('role')->withTimestamps();
+    }
+
+    public function aiConnections(): HasMany
+    {
+        return $this->hasMany(AiConnection::class);
+    }
+
+    public function defaultAiConnection(): BelongsTo
+    {
+        return $this->belongsTo(AiConnection::class, 'default_ai_connection_id');
     }
 }

@@ -16,7 +16,7 @@
         @include('partials.header')
 
         <div class="body flex-grow-1">
-            <main class="container-lg px-4">
+            <main class="container-lg px-4 pb-4">
                 @include('partials.breadcrumbs', ['breadcrumbs' => $breadcrumbs])
 
                 @if (session('status'))
